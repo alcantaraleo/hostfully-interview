@@ -159,6 +159,23 @@ class BookingTest {
   @Test
   @DisplayName("""
       Given a cancelled booking,
+      should cancel again,
+            
+      """)
+  void givenCancelledScheduledBookingShouldCancelAgain() {
+    //arrange
+    final var booking = BookingFixture.createBooking().cancel();
+
+    //act && assert
+    final var result = booking.cancel();
+
+    assertThat(result.isCancelled()).isTrue();
+
+  }
+
+  @Test
+  @DisplayName("""
+      Given a cancelled booking,
       should rebook successfully,
       when rebooking
       """)
@@ -188,7 +205,8 @@ class BookingTest {
     final var proposedEndDate = LocalDate.of(2024, 3, 10);
 
     //act
-    assertThatThrownBy(() ->booking.rebook(proposedStartDate, proposedEndDate)).isInstanceOf(BookingInvalidStatusException.class);
+    assertThatThrownBy(() -> booking.rebook(proposedStartDate, proposedEndDate)).isInstanceOf(
+        BookingInvalidStatusException.class);
 
   }
 
@@ -205,7 +223,8 @@ class BookingTest {
     final var proposedEndDate = LocalDate.of(2024, 3, 5);
 
     //act
-    assertThatThrownBy(() ->booking.rebook(proposedStartDate, proposedEndDate)).isInstanceOf(BookingDatesInvalid.class);
+    assertThatThrownBy(() -> booking.rebook(proposedStartDate, proposedEndDate)).isInstanceOf(
+        BookingDatesInvalid.class);
 
   }
 
