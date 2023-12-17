@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/properties")
@@ -32,10 +33,12 @@ public class PropertyController {
   private final PropertyModelDTOMapper propertyModelDTOMapper;
 
   @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<PropertyDTO> createProperty(@RequestBody @Valid PropertyDTO propertyDTO) {
+  public ResponseEntity<Object> createProperty(@RequestBody @Valid PropertyDTO propertyDTO) {
     final var property = this.createProperty.createProperty(
         this.propertyModelDTOMapper.fromDTO(propertyDTO));
-    return ResponseEntity.ok(this.propertyModelDTOMapper.fromModel(property));
+    return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+        .buildAndExpand(property.getId()).toUri()).body(property);
+
   }
 
   @GetMapping(produces = APPLICATION_JSON_VALUE)
