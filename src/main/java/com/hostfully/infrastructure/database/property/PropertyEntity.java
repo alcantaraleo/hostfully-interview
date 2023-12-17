@@ -21,6 +21,7 @@ public class PropertyEntity {
   @Column(nullable = false)
   private UUID id;
 
+  @Column(unique = true)
   private String alias;
 
   private LocalDateTime createdAt;

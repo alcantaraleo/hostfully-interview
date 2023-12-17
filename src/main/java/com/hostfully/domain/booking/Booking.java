@@ -1,6 +1,7 @@
 package com.hostfully.domain.booking;
 
 import com.hostfully.domain.guest.Guest;
+import com.hostfully.domain.property.Property;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -30,6 +31,8 @@ public class Booking {
 
   @Builder.Default
   private final BookingStatus status = BookingStatus.SCHEDULED;
+
+  private final Property property;
 
   public boolean isCancelled() {
     return BookingStatus.CANCELLED.equals(this.status);

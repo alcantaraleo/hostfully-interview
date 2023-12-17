@@ -6,7 +6,7 @@ import lombok.NonNull;
 import lombok.With;
 
 @With(AccessLevel.PRIVATE)
-public record Guest(@NonNull String firstName,@NonNull String lastName,@NonNull LocalDate dateOfBirth) {
+public record Guest(@NonNull String firstName, @NonNull String lastName, @NonNull LocalDate dateOfBirth) {
 
   public Guest updateDetails(@NonNull Guest proposedGuest) {
 
