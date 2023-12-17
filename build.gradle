@@ -50,4 +50,60 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+	testLogging {
+		events "passed", "skipped", "failed"
+		exceptionFormat "full"
+		debug {
+			events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+			exceptionFormat "full"
+		}
+	}
+
+	jacoco {
+		destinationFile = file("$buildDir/results/jacoco/test.exec")
+	}
 }
+
+jacocoTestReport {
+
+	doLast {
+		println("")
+		println("See report file://${project.rootDir}/build/reports/jacoco/test/html/index.html")
+		println("")
+	}
+	executionData.setFrom(file("$buildDir/results/jacoco/test.exec"))
+
+
+
+	reports {
+		xml.required = true
+		csv.required = false
+		html.required = true
+	}
+
+	afterEvaluate {
+		excludeFilesFromReport(classDirectories)
+	}
+
+}
+
+jacocoTestCoverageVerification {
+	afterEvaluate {
+		excludeFilesFromReport(classDirectories)
+	}
+}
+
+private excludeFilesFromReport(classDirectories) {
+
+	def exclusions = ["**/*Configuration.*", "**/*Response.*", "**/*DTO.*",
+					  "**/*Exception.*", "**/*Application.*", "**/config*/*", "**/exception/*",
+					   "**/generated/**", ]
+
+	classDirectories.setFrom(files(classDirectories.files.collect {
+		fileTree(dir: it, exclude: exclusions)
+	}))
+}
+
+check.dependsOn jacocoTestReport
