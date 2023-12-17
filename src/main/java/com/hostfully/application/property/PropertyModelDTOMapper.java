@@ -1,4 +1,4 @@
-package com.hostfully.infrastructure.converters.property;
+package com.hostfully.application.property;
 
 import com.hostfully.application.property.PropertyDTO;
 import com.hostfully.domain.property.Property;

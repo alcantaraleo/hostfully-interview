@@ -5,7 +5,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import com.hostfully.domain.property.usecase.CreateProperty;
 import com.hostfully.domain.property.usecase.FindProperty;
 import com.hostfully.domain.property.usecase.ListProperties;
-import com.hostfully.infrastructure.converters.property.PropertyModelDTOMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -37,7 +36,7 @@ public class PropertyController {
     final var property = this.createProperty.createProperty(
         this.propertyModelDTOMapper.fromDTO(propertyDTO));
     return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-        .buildAndExpand(property.getId()).toUri()).body(property);
+        .buildAndExpand(property.getId()).toUri()).body(this.propertyModelDTOMapper.fromModel(property));
 
   }
 

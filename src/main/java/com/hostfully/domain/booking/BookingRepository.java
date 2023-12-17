@@ -13,4 +13,6 @@ public interface BookingRepository {
 
   List<Booking> findByPropertyId(UUID propertyId);
 
+  List<Booking> findByPropertyIdAndStatus(UUID propertyId, List<BookingStatus> statuses);
+
 }

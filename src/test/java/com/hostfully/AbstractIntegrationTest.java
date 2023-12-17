@@ -1,11 +1,9 @@
 package com.hostfully;
 
-import com.hostfully.configuration.MockMvcConfiguration;
 import com.hostfully.domain.property.usecase.CreateProperty;
 import com.hostfully.domain.property.usecase.FindProperty;
 import com.hostfully.domain.property.usecase.ListProperties;
-import com.hostfully.infrastructure.converters.property.PropertyModelDTOMapper;
-import org.junit.jupiter.api.Test;
+import com.hostfully.application.property.PropertyModelDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;

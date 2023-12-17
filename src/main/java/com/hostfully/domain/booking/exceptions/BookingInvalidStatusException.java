@@ -1,4 +1,4 @@
-package com.hostfully.domain.booking;
+package com.hostfully.domain.booking.exceptions;
 
 public class BookingInvalidStatusException extends RuntimeException{
 

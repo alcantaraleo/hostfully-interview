@@ -1,5 +1,7 @@
 package com.hostfully.domain.booking;
 
+import com.hostfully.domain.booking.exceptions.BookingInvalidStatusException;
+import com.hostfully.domain.booking.exceptions.InvalidBookingDatesException;
 import com.hostfully.domain.guest.Guest;
 import com.hostfully.domain.property.Property;
 import java.time.LocalDate;
@@ -13,32 +15,43 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.With;
 
-@RequiredArgsConstructor
-@ToString
+@RequiredArgsConstructor(onConstructor_ = {@Builder})
+@ToString(onlyExplicitlyIncluded = true)
 @Getter
 @With(AccessLevel.PRIVATE)
 @Builder
 public class Booking {
 
+  @ToString.Include
   private final UUID id;
 
+  @ToString.Include
   private final LocalDate startDate;
+
+  @ToString.Include
   private final LocalDate endDate;
 
+  @ToString.Include
   private final Guest guest;
+
+  private final LocalDateTime createdAt;
 
   private final LocalDateTime cancellationDate;
 
   @Builder.Default
+  @ToString.Include
   private final BookingStatus status = BookingStatus.SCHEDULED;
 
+  @ToString.Include
   private final Property property;
 
   public boolean isCancelled() {
     return BookingStatus.CANCELLED.equals(this.status);
   }
 
-  public boolean isCompleted() { return BookingStatus.COMPLETED.equals(this.status); }
+  public boolean isCompleted() {
+    return BookingStatus.COMPLETED.equals(this.status);
+  }
 
   public Booking updateDates(@NonNull LocalDate proposedStartDate,
       @NonNull LocalDate proposedEndDate) {
@@ -63,6 +76,7 @@ public class Booking {
     return this.withStatus(BookingStatus.CANCELLED).withCancellationDate(LocalDateTime.now());
 
   }
+
   public Booking complete() {
     if (this.isCancelled()) {
       throw new BookingInvalidStatusException("Can't complete an already cancelled booking");
@@ -87,7 +101,7 @@ public class Booking {
 
   private void checkProposedDatesAreValid(LocalDate proposedStartDate, LocalDate proposedEndDate) {
     if (proposedEndDate.isBefore(proposedStartDate)) {
-      throw new BookingDatesInvalid("Supplied booking dates are invalid. Please verify");
+      throw new InvalidBookingDatesException("Supplied booking dates are invalid. Please verify");
     }
   }
 

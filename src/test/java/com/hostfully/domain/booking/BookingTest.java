@@ -3,6 +3,8 @@ package com.hostfully.domain.booking;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.hostfully.domain.booking.exceptions.BookingInvalidStatusException;
+import com.hostfully.domain.booking.exceptions.InvalidBookingDatesException;
 import com.hostfully.domain.guest.GuestFixture;
 import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
@@ -130,7 +132,7 @@ class BookingTest {
 
     //act && assert
     Assertions.assertThatThrownBy(() -> booking.updateDates(proposedStartDate, proposedEndDate))
-        .isInstanceOf(BookingDatesInvalid.class);
+        .isInstanceOf(InvalidBookingDatesException.class);
 
   }
 
@@ -224,7 +226,7 @@ class BookingTest {
 
     //act
     assertThatThrownBy(() -> booking.rebook(proposedStartDate, proposedEndDate)).isInstanceOf(
-        BookingDatesInvalid.class);
+        InvalidBookingDatesException.class);
 
   }
 
