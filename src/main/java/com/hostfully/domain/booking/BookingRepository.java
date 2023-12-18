@@ -1,9 +1,12 @@
 package com.hostfully.domain.booking;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BookingRepository {
+
+  Optional<Booking> findById(UUID bookingId);
 
   Booking save(Booking booking);
 

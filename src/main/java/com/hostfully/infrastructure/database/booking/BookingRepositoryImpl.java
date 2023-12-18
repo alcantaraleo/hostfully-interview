@@ -5,6 +5,7 @@ import com.hostfully.domain.booking.BookingRepository;
 import com.hostfully.domain.booking.BookingStatus;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,11 @@ public class BookingRepositoryImpl implements BookingRepository {
 
   private final BookingModelEntityMapper modelEntityMapper;
   private final BookingH2Repository bookingH2Repository;
+
+  @Override
+  public Optional<Booking> findById(UUID bookingId) {
+    return this.bookingH2Repository.findById(bookingId).map(this.modelEntityMapper::fromEntity);
+  }
 
   @Override
   public Booking save(Booking booking) {

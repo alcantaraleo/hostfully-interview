@@ -26,6 +26,7 @@ public class BookingFixture {
         .endDate(endDate)
         .property(PropertyFixture.createProperty())
         .guest(GuestFixture.createGuest())
+        .status(BookingStatus.SCHEDULED)
         .build();
   }
 

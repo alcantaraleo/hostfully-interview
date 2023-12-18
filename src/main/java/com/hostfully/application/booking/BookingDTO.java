@@ -31,4 +31,8 @@ public class BookingDTO {
   @NotNull(message = "Property Identifier must be supplied")
   private final UUID propertyId;
 
+  public static BookingDTO createFromId(UUID bookingId) {
+    return BookingDTO.builder().id(bookingId).build();
+  }
+
 }

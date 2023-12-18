@@ -1,7 +1,8 @@
 package com.hostfully.domain.booking;
 
-import com.hostfully.domain.booking.exceptions.BookingInvalidStatusException;
-import com.hostfully.domain.booking.exceptions.InvalidBookingDatesException;
+import com.hostfully.domain.booking.exceptions.ErrorStatus;
+import com.hostfully.domain.booking.exceptions.InvalidBookingException;
+import com.hostfully.domain.booking.exceptions.InvalidBookingStatusException;
 import com.hostfully.domain.guest.Guest;
 import com.hostfully.domain.property.Property;
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +19,14 @@ import lombok.With;
 
 @RequiredArgsConstructor(onConstructor_ = {@Builder})
 @ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @With(AccessLevel.PRIVATE)
 @Builder
 public class Booking {
 
   @ToString.Include
+  @EqualsAndHashCode.Include
   private final UUID id;
 
   @ToString.Include
@@ -65,7 +69,7 @@ public class Booking {
 
   public Booking cancel() {
     if (this.isCompleted()) {
-      throw new BookingInvalidStatusException("Can't cancel an already completed booking");
+      throw new InvalidBookingStatusException("Can't cancel an already completed booking");
     }
 
     //in case this booking is already cancelled, just return it
@@ -79,7 +83,7 @@ public class Booking {
 
   public Booking complete() {
     if (this.isCancelled()) {
-      throw new BookingInvalidStatusException("Can't complete an already cancelled booking");
+      throw new InvalidBookingStatusException("Can't complete an already cancelled booking", ErrorStatus.CANNOT_COMPLETE_CANCELLED_BOOKING);
     }
 
     return this.withStatus(BookingStatus.COMPLETED);
@@ -89,19 +93,20 @@ public class Booking {
   public Booking rebook(@NonNull LocalDate proposedStartDate, @NonNull LocalDate proposedEndDate) {
 
     if (!this.isCancelled()) {
-      throw new BookingInvalidStatusException("Cannot rebook a non cancelled booking");
+      throw new InvalidBookingStatusException("Cannot rebook a non cancelled booking", ErrorStatus.CANNOT_REBOOK_NOT_CANCELLED_BOOKING);
     }
 
     checkProposedDatesAreValid(proposedStartDate, proposedEndDate);
 
     return this.withStartDate(proposedStartDate).withEndDate(proposedEndDate)
-        .withStatus(BookingStatus.SCHEDULED);
+        .withStatus(BookingStatus.SCHEDULED).withCancellationDate(null);
 
   }
 
   private void checkProposedDatesAreValid(LocalDate proposedStartDate, LocalDate proposedEndDate) {
     if (proposedEndDate.isBefore(proposedStartDate)) {
-      throw new InvalidBookingDatesException("Supplied booking dates are invalid. Please verify");
+      throw new InvalidBookingException("Supplied booking dates are invalid. Please verify",
+          ErrorStatus.BOOKING_DATES_INVALID);
     }
   }
 

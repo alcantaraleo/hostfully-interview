@@ -3,8 +3,8 @@ package com.hostfully.domain.booking;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.hostfully.domain.booking.exceptions.BookingInvalidStatusException;
-import com.hostfully.domain.booking.exceptions.InvalidBookingDatesException;
+import com.hostfully.domain.booking.exceptions.InvalidBookingException;
+import com.hostfully.domain.booking.exceptions.InvalidBookingStatusException;
 import com.hostfully.domain.guest.GuestFixture;
 import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
@@ -62,7 +62,7 @@ class BookingTest {
     final var booking = BookingFixture.createBooking().complete();
 
     //act
-    assertThatThrownBy(booking::cancel).isInstanceOf(BookingInvalidStatusException.class);
+    assertThatThrownBy(booking::cancel).isInstanceOf(InvalidBookingStatusException.class);
   }
 
   @Test
@@ -94,7 +94,7 @@ class BookingTest {
     final var booking = BookingFixture.createBooking().cancel();
 
     //act && assert
-    assertThatThrownBy(booking::complete).isInstanceOf(BookingInvalidStatusException.class);
+    assertThatThrownBy(booking::complete).isInstanceOf(InvalidBookingStatusException.class);
 
   }
 
@@ -132,7 +132,7 @@ class BookingTest {
 
     //act && assert
     Assertions.assertThatThrownBy(() -> booking.updateDates(proposedStartDate, proposedEndDate))
-        .isInstanceOf(InvalidBookingDatesException.class);
+        .isInstanceOf(InvalidBookingException.class);
 
   }
 
@@ -208,7 +208,7 @@ class BookingTest {
 
     //act
     assertThatThrownBy(() -> booking.rebook(proposedStartDate, proposedEndDate)).isInstanceOf(
-        BookingInvalidStatusException.class);
+        InvalidBookingStatusException.class);
 
   }
 
@@ -226,7 +226,7 @@ class BookingTest {
 
     //act
     assertThatThrownBy(() -> booking.rebook(proposedStartDate, proposedEndDate)).isInstanceOf(
-        InvalidBookingDatesException.class);
+        InvalidBookingException.class);
 
   }
 

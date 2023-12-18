@@ -14,4 +14,8 @@ public class GuestFixture {
     return new Guest("James", "Kirk", LocalDate.of(1955, 7, 1));
   }
 
+  public static Guest createGuest(String firstName, String lastName) {
+    return new Guest(firstName, lastName, LocalDate.now());
+  }
+
 }
