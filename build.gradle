@@ -1,0 +1,164 @@
+import com.kageiit.jacobo.JacoboTask
+
+buildscript {
+
+	repositories {
+		mavenCentral()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+		maven {
+			url = uri("https://jitpack.io")
+		}
+
+	}
+	dependencies {
+		classpath "gradle.plugin.com.kageiit:jacobo-plugin:2.1.0"
+		classpath "org.barfuin.gradle.jacocolog:gradle-jacoco-log:3.1.0"
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:6.23.3"
+	}
+
+
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.0'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'jacoco'
+	id 'com.kageiit.jacobo' version '2.1.0'
+	id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+	id 'com.diffplug.spotless' version '6.23.3'
+}
+repositories {
+	mavenCentral()
+}
+
+
+group = 'com.hostfully'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+	compileOnly 'org.projectlombok:lombok'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
+	testImplementation 'org.hamcrest:hamcrest-all:1.3'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+	testLogging {
+		events "passed", "skipped", "failed"
+		exceptionFormat "full"
+		debug {
+			events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+			exceptionFormat "full"
+		}
+	}
+
+	jacoco {
+		destinationFile = file("$buildDir/results/jacoco/test.exec")
+	}
+
+	def spotless = tasks.named('spotlessCheck')
+	if (spotless.present) {
+		finalizedBy spotless
+	}
+}
+
+jacocoTestReport {
+
+	doLast {
+		println("")
+		println("See report file://${project.rootDir}/build/reports/jacoco/test/html/index.html")
+		println("")
+	}
+	executionData.setFrom(file("$buildDir/results/jacoco/test.exec"))
+
+
+
+	reports {
+		xml.required = true
+		csv.required = false
+		html.required = true
+	}
+
+	afterEvaluate {
+		excludeFilesFromReport(classDirectories)
+	}
+
+}
+
+jacocoTestCoverageVerification {
+	afterEvaluate {
+		excludeFilesFromReport(classDirectories)
+	}
+}
+
+private excludeFilesFromReport(classDirectories) {
+
+	def exclusions = ["**/*Configuration.*", "**/*Response.*", "**/*DTO.*",
+					  "**/*Exception.*", "**/*Application.*", "**/config*/*", "**/exception/*",
+					   "**/generated/**","**/*Mapper*.*" ]
+
+	classDirectories.setFrom(files(classDirectories.files.collect {
+		fileTree(dir: it, exclude: exclusions)
+	}))
+}
+
+
+project.tasks.create("jacobo", JacoboTask) {
+	dependsOn(jacocoTestReport)
+	jacocoReport = file("$buildDir/reports/jacoco/test/jacocoTestReport.xml")
+	coberturaReport = file("$buildDir/reports/cobertura/cobertura.xml")
+	srcDirs = sourceSets.main.java.srcDirs
+	includeFileNames = []
+}
+
+jacocoLogTestCoverage {
+	dependsOn(jacobo)
+}
+
+spotless {
+	java {
+		target '*/src/main/java/**/*.java', '*/src/integration/**/*.java', '*/src/test/**/*.java'
+		targetExclude '*/src/**/resources/*.*', '*/src/generated/**/*.*'
+		googleJavaFormat('1.17.0')
+		trimTrailingWhitespace()
+		removeUnusedImports()
+		formatAnnotations()
+		endWithNewline()
+		importOrder()
+	}
+}
+
+check.dependsOn jacocoLogTestCoverage

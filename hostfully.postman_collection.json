@@ -1,0 +1,217 @@
+{
+  "info": {
+    "_postman_id": "bf7533cf-9633-4c4f-8485-0abb58a1f9f2",
+    "name": "requests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Properties",
+      "item": [
+        {
+          "name": "Create Property",
+          "request": {
+            "description": "",
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "User-Agent", "value": "insomnia/8.4.5" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n\t\"alias\": \"Test\"\n}" },
+            "url": {
+              "raw": "http://localhost:8080/properties",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": ["properties"]
+            },
+            "auth": {}
+          },
+          "response": []
+        },
+        {
+          "name": "List Properties",
+          "request": {
+            "description": "",
+            "method": "GET",
+            "header": [{ "key": "User-Agent", "value": "insomnia/8.4.5" }],
+            "url": {
+              "raw": "http://localhost:8080/properties",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": ["properties"]
+            },
+            "auth": {}
+          },
+          "response": []
+        },
+        {
+          "name": "Find Property By ID",
+          "request": {
+            "description": "",
+            "method": "GET",
+            "header": [{ "key": "User-Agent", "value": "insomnia/8.4.5" }],
+            "url": {
+              "raw": "http://localhost:8080/properties/13f855b9-c112-4c4b-923a-7e1257a61026",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": ["properties", "13f855b9-c112-4c4b-923a-7e1257a61026"]
+            },
+            "auth": {}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "description": "",
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "User-Agent", "value": "insomnia/8.4.5" },
+              { "key": "", "value": "" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"startDate\": \"2024-01-21\",\n\t\"endDate\": \"2024-01-22\",\n\t\"guest\": {\n\t\t\"firstName\": \"Leo\",\n\t\t\"lastName\": \"Alcantara\",\n\t\t\"dateOfBirth\": \"1986-04-09\"\n\t},\n\t\"propertyId\": \"d2453939-0f83-4beb-8965-855d1afe3545\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/bookings",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": ["bookings"]
+            },
+            "auth": {}
+          },
+          "response": []
+        },
+        {
+          "name": "List Bookings",
+          "request": {
+            "description": "",
+            "method": "GET",
+            "header": [
+              { "key": "User-Agent", "value": "insomnia/8.4.5" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/bookings",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": ["bookings"]
+            },
+            "auth": {}
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "description": "",
+            "method": "PATCH",
+            "header": [{ "key": "User-Agent", "value": "insomnia/8.4.5" }],
+            "url": {
+              "raw": "http://localhost:8080/bookings/d0ed8f69-1aa3-4d98-8bfe-8477ccbdfc60/cancel",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": [
+                "bookings",
+                "d0ed8f69-1aa3-4d98-8bfe-8477ccbdfc60",
+                "cancel"
+              ]
+            },
+            "auth": {}
+          },
+          "response": []
+        },
+        {
+          "name": "Update Guest Details",
+          "request": {
+            "description": "",
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "User-Agent", "value": "insomnia/8.4.5" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"firstName\": \"Updating Name\",\n\t\"lastName\": \"Updating Last Name\",\n\t\"dateOfBirth\": \"1900-01-01\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/bookings/4c92d47d-ff70-4014-92da-54e33547f9fe/guest",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": [
+                "bookings",
+                "4c92d47d-ff70-4014-92da-54e33547f9fe",
+                "guest"
+              ]
+            },
+            "auth": {}
+          },
+          "response": []
+        },
+        {
+          "name": "Rebook Booking",
+          "request": {
+            "description": "",
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "User-Agent", "value": "insomnia/8.4.5" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"startDate\": \"2024-01-01\",\n\t\"endDate\": \"2024-01-10\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/bookings/d0ed8f69-1aa3-4d98-8bfe-8477ccbdfc60/rebook",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": [
+                "bookings",
+                "d0ed8f69-1aa3-4d98-8bfe-8477ccbdfc60",
+                "rebook"
+              ]
+            },
+            "auth": {}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Blocks",
+      "item": [
+        {
+          "name": "Create Block",
+          "request": {
+            "description": "",
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "User-Agent", "value": "insomnia/8.5.0" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"startDate\": \"2024-01-21\",\n\t\"endDate\": \"2024-01-31\",\n\t\"propertyId\": \"d2453939-0f83-4beb-8965-855d1afe3545\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/blocks",
+              "protocol": "http",
+              "host": ["localhost:8080"],
+              "path": ["blocks"]
+            },
+            "auth": {}
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
