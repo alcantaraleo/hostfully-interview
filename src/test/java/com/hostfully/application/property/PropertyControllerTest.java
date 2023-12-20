@@ -1,11 +1,10 @@
-package com.hostfully.domain.property;
+package com.hostfully.application.property;
 
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.with;
 
 import com.hostfully.AbstractIntegrationTest;
-import com.hostfully.application.property.PropertyController;
-import com.hostfully.application.property.PropertyDTO;
+import com.hostfully.domain.property.PropertyFixture;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.assertj.core.api.Assertions;

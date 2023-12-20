@@ -30,4 +30,23 @@ public class BookingFixture {
         .build();
   }
 
+  public static Booking createBookingWithProperty(Property property) {
+    return BookingFixture.createBookingWithProperty(property,
+        LocalDate.of(2024, 1, 10),
+        LocalDate.of(2024, 1, 17))
+        ;
+  }
+
+  public static Booking createBookingWithProperty(Property property, LocalDate startDate,
+      LocalDate endDate) {
+    return Booking.builder()
+        .id(UUID.randomUUID())
+        .startDate(startDate)
+        .endDate(endDate)
+        .property(property)
+        .guest(GuestFixture.createGuest())
+        .status(BookingStatus.SCHEDULED)
+        .build();
+  }
+
 }
