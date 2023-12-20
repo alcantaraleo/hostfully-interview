@@ -9,12 +9,14 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.With;
 
 @RequiredArgsConstructor
 @Getter
 @Builder
 public class BookingDTO {
 
+  @With
   private final UUID id;
 
   @NotNull(message = "Booking start date must be supplied")
@@ -33,6 +35,10 @@ public class BookingDTO {
 
   public static BookingDTO createFromId(UUID bookingId) {
     return BookingDTO.builder().id(bookingId).build();
+  }
+
+  public static BookingDTO createFromGuest(GuestDTO guest) {
+    return BookingDTO.builder().guest(guest).build();
   }
 
 }

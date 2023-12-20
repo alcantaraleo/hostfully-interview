@@ -9,7 +9,8 @@ import com.hostfully.domain.booking.Booking;
 import com.hostfully.domain.booking.BookingFixture;
 import com.hostfully.domain.booking.BookingRepository;
 import com.hostfully.domain.booking.exceptions.BookingNotFoundException;
-import com.hostfully.domain.booking.exceptions.InvalidBookingException;
+import com.hostfully.domain.booking.exceptions.ErrorStatus;
+import com.hostfully.domain.booking.exceptions.InvalidBookingStatusException;
 import com.hostfully.domain.booking.services.DomainBookingService;
 import com.hostfully.domain.booking.services.DomainBookingValidationService;
 import com.hostfully.domain.property.PropertyRepository;
@@ -96,25 +97,23 @@ public class RebookBookingTest {
 
   @Test
   @DisplayName("""
-      Given a cancelled booking,
-      should not rebook successfully,
-      when there are validation issues with other bookings  
+      Given a not cancelled booking,
+      should not rebook successfully        
       """)
-  void givenCancelledScheduledBooking_ShouldNotRebookSuccessfully_WhenThereAreValidationIssuesWithOtherBookings() {
+  void givenNotCancelledScheduledBooking_ShouldNotRebookSuccessfully() {
     //arrange
-    final var cancelledBooking = BookingFixture.createBooking().cancel();
-    final List<Booking> existingBookings = Collections.emptyList();
-    when(this.bookingRepository.findById(cancelledBooking.getId())).thenReturn(
-        Optional.of(cancelledBooking));
-    when(this.bookingRepository.findByPropertyIdAndStatus(cancelledBooking.getProperty().getId(),
-        DomainBookingService.ACTIVE_BOOKINGS)).thenReturn(existingBookings
-    );
-    when(this.bookingValidationService.validate(cancelledBooking, existingBookings)).thenReturn(
-        false);
+    final var booking = BookingFixture.createBooking();
+
+    when(this.bookingRepository.findById(booking.getId())).thenReturn(
+        Optional.of(booking));
 
     //act
-    assertThatThrownBy(() -> this.subject.rebookBooking(cancelledBooking)).isInstanceOf(
-        InvalidBookingException.class);
+    assertThatThrownBy(() -> this.subject.rebookBooking(booking)).isInstanceOf(
+        InvalidBookingStatusException.class).satisfies(ex -> {
+      final var invalidBookingStatusException = (InvalidBookingStatusException) ex;
+      Assertions.assertThat(invalidBookingStatusException.getErrorStatus()
+          .equals(ErrorStatus.CANNOT_REBOOK_NOT_CANCELLED_BOOKING));
+    });
 
   }
 

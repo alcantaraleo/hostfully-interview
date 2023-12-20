@@ -6,6 +6,7 @@ import com.hostfully.domain.booking.BookingStatus;
 import com.hostfully.domain.booking.exceptions.BookingNotFoundException;
 import com.hostfully.domain.booking.exceptions.ErrorStatus;
 import com.hostfully.domain.booking.exceptions.InvalidBookingException;
+import com.hostfully.domain.booking.exceptions.InvalidBookingStatusException;
 import com.hostfully.domain.booking.usecases.CancelBooking;
 import com.hostfully.domain.booking.usecases.ListBookings;
 import com.hostfully.domain.booking.usecases.RebookBooking;
@@ -82,9 +83,13 @@ public class DomainBookingService implements RegisterBooking, CancelBooking, Upd
     final var booking = findBookingOrThrow(
         toBeRebookedBooking);
 
+    if (!booking.isCancelled()) {
+      throw new InvalidBookingStatusException("Booking is not cancelled, cannot rebook",
+          ErrorStatus.CANNOT_REBOOK_NOT_CANCELLED_BOOKING);
+    }
+
     final var existingBookings = this.bookingRepository.findByPropertyIdAndStatus(
         booking.getProperty().getId(), ACTIVE_BOOKINGS);
-    existingBookings.remove(booking);
     final var expectedRebooking = booking.rebook(toBeRebookedBooking.getStartDate(),
         toBeRebookedBooking.getEndDate());
 
