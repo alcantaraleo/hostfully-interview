@@ -90,7 +90,7 @@ public class RebookBookingTest {
     when(this.bookingRepository.findById(booking.getId())).thenReturn(Optional.empty());
 
     //act
-    Assertions.assertThatThrownBy(() -> this.subject.rebookBooking(booking)).isInstanceOf(
+    assertThatThrownBy(() -> this.subject.rebookBooking(booking)).isInstanceOf(
         BookingNotFoundException.class);
 
   }
@@ -111,7 +111,7 @@ public class RebookBookingTest {
     assertThatThrownBy(() -> this.subject.rebookBooking(booking)).isInstanceOf(
         InvalidBookingStatusException.class).satisfies(ex -> {
       final var invalidBookingStatusException = (InvalidBookingStatusException) ex;
-      Assertions.assertThat(invalidBookingStatusException.getErrorStatus()
+      assertThat(invalidBookingStatusException.getErrorStatus()
           .equals(ErrorStatus.CANNOT_REBOOK_NOT_CANCELLED_BOOKING));
     });
 
