@@ -1,5 +1,7 @@
 package com.hostfully.domain.booking.services;
 
+import com.hostfully.domain.block.services.DomainBlockService;
+import com.hostfully.domain.block.services.DomainBlockValidationService;
 import com.hostfully.domain.booking.Booking;
 import com.hostfully.domain.booking.BookingRepository;
 import com.hostfully.domain.booking.BookingStatus;
@@ -33,6 +35,10 @@ public class DomainBookingService implements RegisterBooking, CancelBooking, Upd
 
   private final PropertyRepository propertyRepository;
 
+  private final DomainBlockService domainBlockService;
+
+  private final DomainBlockValidationService blockValidationService;
+
   @Override
   public Booking registerBooking(final Booking booking) {
 
@@ -45,20 +51,12 @@ public class DomainBookingService implements RegisterBooking, CancelBooking, Upd
           "Property with identifier " + propertyId + " could not be found");
     }
 
-    final var existingBookings = this.bookingRepository.findByPropertyIdAndStatus(propertyId,
-        ACTIVE_BOOKINGS);
-
-    final var isNewBookingValid = this.bookingValidationService.validate(booking, existingBookings);
-
-    if (!isNewBookingValid) {
-      log.error("Supplied Booking is not valid. Please verify it's details");
-      throw new InvalidBookingException("Supplied booking is not valid",
-          ErrorStatus.BOOKING_DATES_UNAVAILABLE);
-    }
+    validateBooking(booking);
 
     return this.bookingRepository.save(booking);
 
   }
+
 
   @Override
   public Booking updateGuestDetails(Booking toBeUpdatedBooking) {
@@ -88,19 +86,10 @@ public class DomainBookingService implements RegisterBooking, CancelBooking, Upd
           ErrorStatus.CANNOT_REBOOK_NOT_CANCELLED_BOOKING);
     }
 
-    final var existingBookings = this.bookingRepository.findByPropertyIdAndStatus(
-        booking.getProperty().getId(), ACTIVE_BOOKINGS);
+    this.validateBooking(toBeRebookedBooking);
+
     final var expectedRebooking = booking.rebook(toBeRebookedBooking.getStartDate(),
         toBeRebookedBooking.getEndDate());
-
-    final var isRebookingValid = this.bookingValidationService.validate(expectedRebooking,
-        existingBookings);
-
-    if (!isRebookingValid) {
-      log.error("Supplied dates for rebooking {} are not valid.", toBeRebookedBooking.getId());
-      throw new InvalidBookingException("Supplied booking is not valid",
-          ErrorStatus.BOOKING_DATES_UNAVAILABLE);
-    }
 
     return this.bookingRepository.update(expectedRebooking);
   }
@@ -117,5 +106,22 @@ public class DomainBookingService implements RegisterBooking, CancelBooking, Upd
           "Could not find Booking with id " + toBeRebookedBooking.getId());
     }
     return optionalBooking.get();
+  }
+
+  private void validateBooking(Booking booking) {
+    final var existingBookings = this.bookingRepository.findByPropertyIdAndStatus(
+        booking.getProperty().getId(),
+        ACTIVE_BOOKINGS);
+    final var existingBlocks = this.domainBlockService.findBlocksByProperty(
+        booking.getProperty().getId());
+
+    final var isNewBookingValid = this.bookingValidationService.validate(booking, existingBookings)
+        && this.blockValidationService.validate(booking, existingBlocks);
+
+    if (!isNewBookingValid) {
+      log.error("Supplied Booking is not valid. Please verify it's details");
+      throw new InvalidBookingException("Supplied booking is not valid",
+          ErrorStatus.BOOKING_DATES_UNAVAILABLE);
+    }
   }
 }

@@ -3,6 +3,7 @@ package com.hostfully.infrastructure.database.booking;
 import com.hostfully.domain.booking.Booking;
 import com.hostfully.domain.booking.BookingRepository;
 import com.hostfully.domain.booking.BookingStatus;
+import com.hostfully.infrastructure.converters.booking.BookingModelEntityMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

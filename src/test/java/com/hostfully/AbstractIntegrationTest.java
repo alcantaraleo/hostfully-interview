@@ -1,8 +1,12 @@
 package com.hostfully;
 
+import com.hostfully.application.block.BlockModelDTOMapper;
 import com.hostfully.application.booking.BookingModelDTOMapper;
 import com.hostfully.application.guest.GuestDTO;
 import com.hostfully.application.property.PropertyModelDTOMapper;
+import com.hostfully.domain.block.BlockRepository;
+import com.hostfully.domain.block.usecases.ListBlocks;
+import com.hostfully.domain.block.usecases.RegisterBlock;
 import com.hostfully.domain.booking.BookingRepository;
 import com.hostfully.domain.booking.usecases.CancelBooking;
 import com.hostfully.domain.booking.usecases.ListBookings;
@@ -63,6 +67,19 @@ public abstract class AbstractIntegrationTest {
 
   @Autowired
   protected BookingRepository bookingRepository;
+
+  @Autowired
+  protected BlockRepository blockRepository;
+
+  @Autowired
+  protected RegisterBlock registerBlock;
+
+  @Autowired
+  protected BlockModelDTOMapper blockModelDTOMapper;
+
+  @Autowired
+  protected ListBlocks listBlocks;
+
 
   protected GuestDTO buildGuestDTO() {
     return GuestDTO.builder().firstName("Booking Test Guest")

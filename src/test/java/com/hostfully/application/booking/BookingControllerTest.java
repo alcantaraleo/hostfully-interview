@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 
-@Tags(value = {@Tag("Integration"), @Tag("Property")})
+@Tags(value = {@Tag("Integration"), @Tag("Booking")})
 class BookingControllerTest extends AbstractIntegrationTest {
 
   private Property testProperty;

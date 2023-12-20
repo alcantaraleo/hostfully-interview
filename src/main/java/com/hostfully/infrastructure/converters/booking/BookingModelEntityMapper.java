@@ -1,6 +1,7 @@
-package com.hostfully.infrastructure.database.booking;
+package com.hostfully.infrastructure.converters.booking;
 
 import com.hostfully.domain.booking.Booking;
+import com.hostfully.infrastructure.database.booking.BookingEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

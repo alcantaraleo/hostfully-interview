@@ -2,6 +2,9 @@ package com.hostfully.domain.booking.usecases;
 
 import static org.mockito.Mockito.when;
 
+import com.hostfully.domain.block.Block;
+import com.hostfully.domain.block.services.DomainBlockService;
+import com.hostfully.domain.block.services.DomainBlockValidationService;
 import com.hostfully.domain.booking.Booking;
 import com.hostfully.domain.booking.BookingFixture;
 import com.hostfully.domain.booking.BookingRepository;
@@ -36,6 +39,12 @@ class RegisterBookingTest {
   @Mock
   private DomainBookingValidationService bookingValidationService;
 
+  @Mock
+  private DomainBlockService domainBlockService;
+
+  @Mock
+  private DomainBlockValidationService domainBlockValidationService;
+
   @InjectMocks
   private DomainBookingService subject;
 
@@ -49,11 +58,14 @@ class RegisterBookingTest {
     //arrange
     final var booking = BookingFixture.createBooking();
     final List<Booking> existingBookings = Collections.emptyList();
+    final List<Block> existingBlocks = Collections.emptyList();
     when(this.propertyRepository.findById(booking.getProperty().getId())).thenReturn(
         Optional.of(booking.getProperty()));
     when(this.bookingRepository.findByPropertyIdAndStatus(booking.getProperty().getId(),
         DomainBookingService.ACTIVE_BOOKINGS)).thenReturn(existingBookings);
+    when(this.domainBlockService.findBlocksByProperty(booking.getProperty().getId())).thenReturn(existingBlocks);
     when(this.bookingValidationService.validate(booking, existingBookings)).thenReturn(true);
+    when(this.domainBlockValidationService.validate(booking, existingBlocks)).thenReturn(true);
     when(this.bookingRepository.save(booking)).thenReturn(booking);
 
     //act
@@ -99,6 +111,30 @@ class RegisterBookingTest {
         DomainBookingService.ACTIVE_BOOKINGS)).thenReturn(existingBookings);
     when(this.bookingValidationService.validate(booking, existingBookings)).thenReturn(false);
 
+
+    //act
+    Assertions.assertThatThrownBy(() -> this.subject.registerBooking(booking)).isInstanceOf(
+        InvalidBookingException.class);
+
+  }
+
+  @Test
+  @DisplayName("""
+      Given block for an existing property,
+      when validations fails,
+      then it should throw
+      """)
+  void givenBlockForExistingProperty_WhenValidationsFails_ThenShouldThrow() {
+    //arrange
+    final var booking = BookingFixture.createBooking();
+    final List<Booking> existingBookings = Collections.emptyList();
+    final List<Block> existingBlocks = Collections.emptyList();
+    when(this.propertyRepository.findById(booking.getProperty().getId())).thenReturn(
+        Optional.of(booking.getProperty()));
+    when(this.bookingRepository.findByPropertyIdAndStatus(booking.getProperty().getId(),
+        DomainBookingService.ACTIVE_BOOKINGS)).thenReturn(existingBookings);
+    when(this.domainBlockService.findBlocksByProperty(booking.getProperty().getId())).thenReturn(existingBlocks);
+    when(this.bookingValidationService.validate(booking, existingBookings)).thenReturn(false);
 
     //act
     Assertions.assertThatThrownBy(() -> this.subject.registerBooking(booking)).isInstanceOf(

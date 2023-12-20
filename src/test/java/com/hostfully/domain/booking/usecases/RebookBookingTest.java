@@ -5,11 +5,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.hostfully.domain.block.Block;
+import com.hostfully.domain.block.services.DomainBlockService;
+import com.hostfully.domain.block.services.DomainBlockValidationService;
 import com.hostfully.domain.booking.Booking;
 import com.hostfully.domain.booking.BookingFixture;
 import com.hostfully.domain.booking.BookingRepository;
 import com.hostfully.domain.booking.exceptions.BookingNotFoundException;
 import com.hostfully.domain.booking.exceptions.ErrorStatus;
+import com.hostfully.domain.booking.exceptions.InvalidBookingException;
 import com.hostfully.domain.booking.exceptions.InvalidBookingStatusException;
 import com.hostfully.domain.booking.services.DomainBookingService;
 import com.hostfully.domain.booking.services.DomainBookingValidationService;
@@ -31,7 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @Tags(value = {@Tag("Unit"), @Tag("Booking"), @Tag("Rebook")})
-public class RebookBookingTest {
+class RebookBookingTest {
 
   @Mock
   private PropertyRepository propertyRepository;
@@ -41,6 +45,12 @@ public class RebookBookingTest {
 
   @Mock
   private DomainBookingValidationService bookingValidationService;
+
+  @Mock
+  private DomainBlockService domainBlockService;
+
+  @Mock
+  private DomainBlockValidationService domainBlockValidationService;
 
   @Captor
   private ArgumentCaptor<Booking> argumentCaptor;
@@ -58,12 +68,17 @@ public class RebookBookingTest {
     //arrange
     final var cancelledBooking = BookingFixture.createBooking().cancel();
     final List<Booking> existingBookings = Collections.emptyList();
+    final List<Block> existingBlocks = Collections.emptyList();
     when(this.bookingRepository.findById(cancelledBooking.getId())).thenReturn(
         Optional.of(cancelledBooking));
     when(this.bookingRepository.findByPropertyIdAndStatus(cancelledBooking.getProperty().getId(),
         DomainBookingService.ACTIVE_BOOKINGS)).thenReturn(existingBookings
     );
+    when(this.domainBlockService.findBlocksByProperty(
+        cancelledBooking.getProperty().getId())).thenReturn(existingBlocks);
     when(this.bookingValidationService.validate(cancelledBooking, existingBookings)).thenReturn(
+        true);
+    when(this.domainBlockValidationService.validate(cancelledBooking, existingBlocks)).thenReturn(
         true);
 
     //act
@@ -80,9 +95,67 @@ public class RebookBookingTest {
 
   @Test
   @DisplayName("""
+      Given a cancelled booking,
+      should not rebook successfully,
+      when there are other bookings overlapping  
+      """)
+  void givenCancelledScheduledBooking_ShouldNotRebookSuccessfully_WhenThereOtherBookings() {
+    //arrange
+    final var cancelledBooking = BookingFixture.createBooking().cancel();
+    final List<Booking> existingBookings = Collections.emptyList();
+    final List<Block> existingBlocks = Collections.emptyList();
+    when(this.bookingRepository.findById(cancelledBooking.getId())).thenReturn(
+        Optional.of(cancelledBooking));
+    when(this.bookingRepository.findByPropertyIdAndStatus(cancelledBooking.getProperty().getId(),
+        DomainBookingService.ACTIVE_BOOKINGS)).thenReturn(existingBookings
+    );
+    when(this.domainBlockService.findBlocksByProperty(
+        cancelledBooking.getProperty().getId())).thenReturn(existingBlocks);
+    when(this.bookingValidationService.validate(cancelledBooking, existingBookings)).thenReturn(
+        false);
+
+    //act
+    Assertions.assertThatThrownBy(() -> this.subject.rebookBooking(cancelledBooking)).isInstanceOf(
+        InvalidBookingException.class);
+
+
+  }
+
+  @Test
+  @DisplayName("""
+      Given a cancelled booking,
+      should not rebook successfully,
+      when there are blocks overlapping  
+      """)
+  void givenCancelledScheduledBooking_ShouldNotRebookSuccessfully_WhenThereBlocks() {
+    //arrange
+    final var cancelledBooking = BookingFixture.createBooking().cancel();
+    final List<Booking> existingBookings = Collections.emptyList();
+    final List<Block> existingBlocks = Collections.emptyList();
+    when(this.bookingRepository.findById(cancelledBooking.getId())).thenReturn(
+        Optional.of(cancelledBooking));
+    when(this.bookingRepository.findByPropertyIdAndStatus(cancelledBooking.getProperty().getId(),
+        DomainBookingService.ACTIVE_BOOKINGS)).thenReturn(existingBookings
+    );
+    when(this.domainBlockService.findBlocksByProperty(
+        cancelledBooking.getProperty().getId())).thenReturn(existingBlocks);
+    when(this.bookingValidationService.validate(cancelledBooking, existingBookings)).thenReturn(
+        true);
+    when(this.domainBlockValidationService.validate(cancelledBooking, existingBlocks)).thenReturn(
+        false);
+
+    //act
+    Assertions.assertThatThrownBy(() -> this.subject.rebookBooking(cancelledBooking)).isInstanceOf(
+        InvalidBookingException.class);
+
+
+  }
+
+  @Test
+  @DisplayName("""
       Given a non existing booking identifier
       should throw exception,
-      when performing rebooking  
+      when performing rebooking 
       """)
   void givenNonExistingIdentifier_ShouldThrowException_WhenPerformingRebooking() {
     //arrange
